@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MultiPlayerCharacter.h"
+
+#include "AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,6 +11,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AM_AttributeSet.h"
+#include "MultiPlayer/MultiPlayer.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,6 +53,10 @@ AMultiPlayerCharacter::AMultiPlayerCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	////////////////////////Ability System Component
+	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("Ability System Component"));
+	AttributeSet = CreateDefaultSubobject<UAM_AttributeSet>(TEXT("Atributte Set"));
 }
 
 void AMultiPlayerCharacter::BeginPlay()
@@ -63,6 +71,30 @@ void AMultiPlayerCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+
+	if (IsValid(AbilitySystemComponent))
+	{
+		for(TSubclassOf<UAM_GameplayAbility>& currentAbility: StartingAbilities)
+		{
+			if(IsValid(currentAbility))
+			{
+				UAM_GameplayAbility* defaultObj = currentAbility->GetDefaultObject<UAM_GameplayAbility>();
+				FGameplayAbilitySpec AbilitySpec(defaultObj, 1, static_cast<int32>(defaultObj->AbilityInputID), this);
+				AbilitySystemComponent->GiveAbility(AbilitySpec);
+			}
+		}
+
+		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	}
+}
+
+void AMultiPlayerCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	if(IsValid(AbilitySystemComponent))
+	{
+		AbilitySystemComponent->RefreshAbilityActorInfo();
 	}
 }
 
@@ -83,6 +115,20 @@ void AMultiPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMultiPlayerCharacter::Look);
+
+		// input Ability System Component bindings
+
+		AbilitySystemComponent->BindAbilityActivationToInputComponent(
+		EnhancedInputComponent, FGameplayAbilityInputBinds(
+			"Confirm",
+			"Cancel",
+			// https://forums.unrealengine.com/t/enum-path-names-what-are-they/742396/3
+			//https://github.com/apesquared/UE_5_1_SRC/blob/eb8f13c535700c28baeef0a28a6e4cc63824e651/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Public/Abilities/GameplayAbilityTypes.h
+			FTopLevelAssetPath(GetPathNameSafe(UClass::TryFindTypeSlow<UEnum>("EAM_AbilityInputID"))),
+			//"EAM_AbilityInputID",
+			static_cast<int32>(EAM_AbilityInputID::Confirm),
+				static_cast<int32>(EAM_AbilityInputID::Cancel)
+				));
 
 	}
 
@@ -123,6 +169,12 @@ void AMultiPlayerCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+UAbilitySystemComponent* AMultiPlayerCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 
 
 

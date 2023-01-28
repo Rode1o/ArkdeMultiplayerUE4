@@ -3,3 +3,8 @@
 
 #include "AM_GameplayAbility.h"
 
+UAM_GameplayAbility::UAM_GameplayAbility()
+{
+	AbilityInputID = EAM_AbilityInputID::None;
+	AbilityID = EAM_AbilityInputID::None;
+}

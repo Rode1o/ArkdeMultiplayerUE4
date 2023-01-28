@@ -5,11 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "AM_GameplayAbility.h"
 #include "MultiPlayerCharacter.generated.h"
+
+class UAM_AttributeSet;
 
 
 UCLASS(config=Game)
-class AMultiPlayerCharacter : public ACharacter
+class AMultiPlayerCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +44,8 @@ class AMultiPlayerCharacter : public ACharacter
 
 public:
 	AMultiPlayerCharacter();
+	virtual void BeginPlay();
+	virtual void PossessedBy(AController* NewController) override;
 	
 
 protected:
@@ -53,14 +60,27 @@ protected:
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
-	// To add mapping context
-	virtual void BeginPlay();
+
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	////////Gameplay Ability System /////////////////////////////////////////////////////////////
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Gameplay Ability System")
+	UAbilitySystemComponent* AbilitySystemComponent;
+
+	UFUNCTION(BlueprintCallable, Category ="Gameplay Ability System")
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Gameplay Ability System")
+	UAM_AttributeSet* AttributeSet;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Gameplay Ability System")
+	TArray<TSubclassOf<UAM_GameplayAbility>> StartingAbilities;
+
+	//////////////////////////////////////////////////////////////////////////////////////////
 };
 
