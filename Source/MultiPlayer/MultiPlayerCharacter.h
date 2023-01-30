@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "AbilitySystemInterface.h"
+#include "Engine.h"
 #include "AbilitySystemComponent.h"
 #include "AM_GameplayAbility.h"
 #include "MultiPlayerCharacter.generated.h"
@@ -42,6 +43,9 @@ class AMultiPlayerCharacter : public ACharacter, public IAbilitySystemInterface
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* CastFireball;
+	
 public:
 	AMultiPlayerCharacter();
 	virtual void BeginPlay();
@@ -55,6 +59,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	virtual void Fireball();
 			
 
 protected:

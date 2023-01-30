@@ -116,6 +116,9 @@ void AMultiPlayerCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 		//Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMultiPlayerCharacter::Look);
 
+		// Ability1
+		EnhancedInputComponent->BindAction(CastFireball, ETriggerEvent::Triggered, this, &AMultiPlayerCharacter::Fireball);
+
 		// input Ability System Component bindings
 
 		AbilitySystemComponent->BindAbilityActivationToInputComponent(
@@ -169,6 +172,13 @@ void AMultiPlayerCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void AMultiPlayerCharacter::Fireball()
+{
+	if(GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Some debug message!"));
+}
+
 
 UAbilitySystemComponent* AMultiPlayerCharacter::GetAbilitySystemComponent() const
 {

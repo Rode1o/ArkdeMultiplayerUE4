@@ -14,7 +14,7 @@ enum class EAM_AbilityInputID : uint8
 	// 2 Cancel
 	Cancel UMETA(DisplayName = "Cancel"),
 	// 3 Ability1
-	Ability1 UMETA(DisplayName = "Ability1"),
+	Ability1 UMETA(DisplayName = "Fireball"),
 	// 4 Ability2
 	Ability2 UMETA(DisplayName = "Ability2"),
 	// 5 Sprint

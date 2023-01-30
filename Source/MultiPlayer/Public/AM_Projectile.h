@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "AM_Projectile.generated.h"
 
+class UProjectileMovementComponent;
+class USphereComponent;
+class UParticleSystemComponent;
+class UNiagaraComponent;
+
+
+
 UCLASS()
 class MULTIPLAYER_API AAM_Projectile : public AActor
 {
@@ -14,6 +21,13 @@ class MULTIPLAYER_API AAM_Projectile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AAM_Projectile();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UProjectileMovementComponent* ProjectileMovementComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USphereComponent* SphereComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UNiagaraComponent* FireBallEffect;
 
 protected:
 	// Called when the game starts or when spawned
